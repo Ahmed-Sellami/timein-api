@@ -1,13 +1,15 @@
 from django.db import models
 
 
-# Create your models here.
 class Project(models.Model):
+    user = models.EmailField(max_length=255, null=True)
     title = models.CharField(max_length=50)
     color = models.IntegerField()
-    icon = models.BinaryField(max_length=1024 * 1024 * 5)  # 5 MB icon
+    icon = models.FileField(upload_to='project_icons/')
+
 
 class Category(models.Model):
+    user = models.EmailField(max_length=255, null=True)
     title = models.CharField(max_length=50)
     color = models.IntegerField()
 
@@ -41,13 +43,19 @@ class Task(models.Model):
     time_spent = models.IntegerField(default=0)  # in seconds
     is_done = models.BooleanField()
 
-class Range(models.Model):
+class Period(models.Model):
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
 
 class Comment(models.Model):
+    task = models.ForeignKey(
+        Task,
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
+    )
     range = models.OneToOneField(
-        Range,
+        Period,
         on_delete=models.CASCADE,
         null=True,
         blank=True

@@ -1,5 +1,3 @@
-from django.db import models
-
 # Create your models here.
 from django.contrib.auth.models import (
     AbstractBaseUser, BaseUserManager, PermissionsMixin)
@@ -32,8 +30,7 @@ class UserManager(BaseUserManager):
         return user
 
 
-AUTH_PROVIDERS = {'facebook': 'facebook', 'google': 'google',
-                  'twitter': 'twitter', 'email': 'email'}
+AUTH_PROVIDERS = {'google': 'google', 'email': 'email'}
 
 
 class User(AbstractBaseUser, PermissionsMixin):
