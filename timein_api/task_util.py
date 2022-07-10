@@ -1,4 +1,4 @@
-from timein_api.models import Task
+from timein_api.models import Task, Comment, Period
 
 
 class Node(object):
@@ -21,11 +21,27 @@ def get_all_tasks(id_project, parent_task) -> Node:
     return node
 
 
+def get_comments(task):
+    result = []
+    for c in Comment.objects.filter(task=task.id):
+        result.append({'period': c.period, 'content': c.content})
+    return result
+
+
+def get_periods(task):
+    result = []
+    for p in Period.objects.filter(task=task.id):
+        result.append({'start_time': str(p.start_time), 'end_time': str(p.end_time)})
+    return result
+
 def get_all_tasks_dict(node):
     t_dict = get_task_dict(node.data)
+    t_dict['comments'] = get_comments(node.data)
+    t_dict['periods'] = get_periods(node.data)
     for c in node.children:
         t_dict['subtasks'].append(get_all_tasks_dict(c))
     return t_dict
+
 
 def get_task_dict(task):
     return {'title': task.title,
@@ -34,4 +50,6 @@ def get_task_dict(task):
             'is_done': task.is_done,
             'category': task.category.id if task.category else task.category,
             'lock_task': task.lock_task,
-            'subtasks': []}
+            'subtasks': [],
+            'comments': [],
+            'periods': []}
