@@ -29,7 +29,7 @@ def get_all_tasks_dict(node):
 
 def get_task_dict(task):
     return {'title': task.title,
-            'desc': task.title,
+            'desc': task.desc,
             'time_spent': task.time_spent,
             'is_done': task.is_done,
             'category': task.category.id if task.category else task.category,

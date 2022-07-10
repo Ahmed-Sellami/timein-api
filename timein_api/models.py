@@ -16,7 +16,9 @@ class Category(models.Model):
 class Task(models.Model):
     project = models.ForeignKey(
         Project,
-        on_delete=models.CASCADE
+        on_delete=models.CASCADE,
+        null=True,
+        blank=True
     )
     category = models.ForeignKey(
         Category,

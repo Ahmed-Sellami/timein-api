@@ -5,7 +5,8 @@ from rest_framework.views import APIView
 
 from .auth_util import get_user
 from .models import Project, Task, Category, Period, Comment
-from .serializers import ProjectSerializer, TaskSerializer, CategorySerializer, PeriodSerializer, CommentSerializer
+from .serializers import ProjectSerializer, TaskSerializer, CategorySerializer, PeriodSerializer, CommentSerializer, \
+    SubtaskSerializer
 from .task_util import get_all_tasks, get_all_tasks_dict
 
 
@@ -24,27 +25,25 @@ class ProjectViewSet(viewsets.ModelViewSet):
     permission_classes = (permissions.IsAuthenticated,)
 
 
-class TaskViewSet(viewsets.ModelViewSet):
+class ProjectTaskViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return Task.objects.filter(project=self.kwargs['project_pk'])
 
     serializer_class = TaskSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
-
-class TaskSubtasksViewSet(viewsets.ModelViewSet):
-    def get_queryset(self):
-        return Task.objects.filter(parent_task=self.kwargs['task_pk'])
-
-    serializer_class = TaskSerializer
-    permission_classes = (permissions.IsAuthenticated,)
-
-
-class SimpleTaskViewSet(viewsets.ModelViewSet):
+class TaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
+
+class SubtaskViewSet(viewsets.ModelViewSet):
+    def get_queryset(self):
+        return Task.objects.filter(parent_task=self.kwargs['task_pk'])
+
+    serializer_class = SubtaskSerializer
+    permission_classes = (permissions.IsAuthenticated,)
 
 class CategoryViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
