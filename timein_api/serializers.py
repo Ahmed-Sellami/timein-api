@@ -18,13 +18,13 @@ class CategorySerializer(serializers.ModelSerializer):
 class PeriodSerializer(serializers.ModelSerializer):
     class Meta:
         model = Period
-        fields = ('start_time', 'end_time')
+        fields = ('task', 'start_time', 'end_time')
 
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = ('task', 'range', 'content')
+        fields = ('task', 'period', 'content')
 
 
 class TaskSerializer(serializers.ModelSerializer):

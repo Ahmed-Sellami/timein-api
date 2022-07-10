@@ -1,9 +1,12 @@
+import simplejson
+from django.http import HttpResponse
 from rest_framework import viewsets, permissions
-from rest_framework_simplejwt.authentication import JWTAuthentication
+from rest_framework.views import APIView
 
-from authentication.models import User
+from .auth_util import get_user
 from .models import Project, Task, Category, Period, Comment
 from .serializers import ProjectSerializer, TaskSerializer, CategorySerializer, PeriodSerializer, CommentSerializer
+from .task_util import get_all_tasks, get_all_tasks_dict
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
@@ -18,7 +21,7 @@ class ProjectViewSet(viewsets.ModelViewSet):
                         color=self.request.data['color'],
                         icon=self.request.data['icon'])
 
-    # permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticated,)
 
 
 class TaskViewSet(viewsets.ModelViewSet):
@@ -26,7 +29,7 @@ class TaskViewSet(viewsets.ModelViewSet):
         return Task.objects.filter(project=self.kwargs['project_pk'])
 
     serializer_class = TaskSerializer
-    # permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticated,)
 
 
 class TaskSubtasksViewSet(viewsets.ModelViewSet):
@@ -34,13 +37,13 @@ class TaskSubtasksViewSet(viewsets.ModelViewSet):
         return Task.objects.filter(parent_task=self.kwargs['task_pk'])
 
     serializer_class = TaskSerializer
-    # permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticated,)
 
 
 class SimpleTaskViewSet(viewsets.ModelViewSet):
     queryset = Task.objects.all()
     serializer_class = TaskSerializer
-    # permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticated,)
 
 
 class CategoryViewSet(viewsets.ModelViewSet):
@@ -54,7 +57,7 @@ class CategoryViewSet(viewsets.ModelViewSet):
                         title=self.request.data['title'],
                         color=self.request.data['color'])
 
-    # permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticated,)
 
 
 class PeriodViewSet(viewsets.ModelViewSet):
@@ -63,7 +66,7 @@ class PeriodViewSet(viewsets.ModelViewSet):
 
     serializer_class = PeriodSerializer
 
-    # permission_classes = (permissions.IsAuthenticated,)
+    permission_classes = (permissions.IsAuthenticated,)
 
 
 class CommentViewSet(viewsets.ModelViewSet):
@@ -71,32 +74,26 @@ class CommentViewSet(viewsets.ModelViewSet):
         return Comment.objects.filter(task=self.kwargs['task_pk'])
 
     serializer_class = CommentSerializer
-    # permission_classes = (permissions.IsAuthenticated,)
-
-
-class SimpleCommentViewSet(viewsets.ModelViewSet):
-    queryset = Comment.objects.all()
-    serializer_class = CommentSerializer
-    # permission_classes = (permissions.IsAuthenticated,)
-
-
-class UserProfileViewSet(viewsets.ModelViewSet):
-    queryset = Period.objects.all()
-    serializer_class = PeriodSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
-    def get_authenticators(self):
-        return super().get_authenticators()
+class AllView(APIView):
+    def get(self, request, format=None):
+        categories = Category.objects.filter(user=get_user(self.request))
+        projects = Project.objects.filter(user=get_user(self.request))
+        projects_detail = []
+        for p in projects:
+            tasks_node = get_all_tasks(p.id, None)
+            tasks = []
+            for c in tasks_node.children:
+                tasks.append(get_all_tasks_dict(c))
+            projects_detail.append(
+                {'title': p.title, 'color': p.color, 'icon': p.icon.url if p.icon else '', 'tasks': tasks}
+            )
 
+        json = simplejson.dumps(
+            {'projects': projects_detail,
+             'categories': [{'id': c.id, 'title': c.title, 'color': c.color} for c in categories]}
+        )
+        return HttpResponse(json, content_type='application/json')
 
-def get_user(request):
-    jwt_object = JWTAuthentication()
-    header = jwt_object.get_header(request)
-    raw_token = jwt_object.get_raw_token(header)
-    validated_token = jwt_object.get_validated_token(raw_token)
-    user = jwt_object.get_user(validated_token)
-    print('User: ' + str(user))
-    authorized_users = User.objects.filter(email=user)
-    if not authorized_users:
-        return None
-    return user
+    permission_classes = (permissions.IsAuthenticated,)

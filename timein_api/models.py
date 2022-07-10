@@ -5,7 +5,7 @@ class Project(models.Model):
     user = models.EmailField(max_length=255, null=True)
     title = models.CharField(max_length=50)
     color = models.IntegerField()
-    icon = models.FileField(upload_to='project_icons/')
+    icon = models.ImageField(upload_to='project_icons/')
 
 
 class Category(models.Model):
@@ -44,17 +44,19 @@ class Task(models.Model):
     is_done = models.BooleanField()
 
 class Period(models.Model):
+    task = models.ForeignKey(
+        Task,
+        on_delete=models.CASCADE
+    )
     start_time = models.DateTimeField()
     end_time = models.DateTimeField()
 
 class Comment(models.Model):
     task = models.ForeignKey(
         Task,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True
+        on_delete=models.CASCADE
     )
-    range = models.OneToOneField(
+    period = models.OneToOneField(
         Period,
         on_delete=models.CASCADE,
         null=True,
