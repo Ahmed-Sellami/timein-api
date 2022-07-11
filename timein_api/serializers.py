@@ -6,13 +6,13 @@ from .models import Project, Task, Category, Period, Comment
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
-        fields = ('user', 'title', 'color', 'icon')
+        fields = ('title', 'color', 'icon')
 
 
 class CategorySerializer(serializers.ModelSerializer):
     class Meta:
         model = Category
-        fields = ('user', 'title', 'color')
+        fields = ('title', 'color')
 
 
 class PeriodSerializer(serializers.ModelSerializer):
@@ -37,7 +37,7 @@ class CommentSerializer(serializers.ModelSerializer):
         fields = ('period', 'content')
 
 
-class TaskSerializer(serializers.ModelSerializer):
+class ProjectTaskSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         validated_data["project"] = Project.objects.get(pk=self.context["view"].kwargs["project_pk"])
         print(validated_data)
@@ -46,6 +46,11 @@ class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
         fields = ('category', 'parent_task', 'lock_task', 'title', 'desc', 'time_spent', 'is_done')
+
+class TaskSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Task
+        fields = ('project', 'category', 'parent_task', 'lock_task', 'title', 'desc', 'time_spent', 'is_done')
 
 
 class SubtaskSerializer(serializers.ModelSerializer):

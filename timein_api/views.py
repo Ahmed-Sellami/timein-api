@@ -1,13 +1,10 @@
-import simplejson
-from django.http import HttpResponse
 from rest_framework import viewsets, permissions
-from rest_framework.views import APIView
 
 from .auth_util import get_user
 from .models import Project, Task, Category, Period, Comment
-from .serializers import ProjectSerializer, TaskSerializer, CategorySerializer, PeriodSerializer, CommentSerializer, \
-    SubtaskSerializer
-from .task_util import get_all_tasks, get_all_tasks_dict
+from .serializers import ProjectSerializer, ProjectTaskSerializer, CategorySerializer, PeriodSerializer, \
+    CommentSerializer, \
+    SubtaskSerializer, TaskSerializer
 
 
 class ProjectViewSet(viewsets.ModelViewSet):
@@ -29,6 +26,11 @@ class ProjectTaskViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         return Task.objects.filter(project=self.kwargs['project_pk'])
 
+    serializer_class = ProjectTaskSerializer
+    permission_classes = (permissions.IsAuthenticated,)
+
+class OngoingTaskViewSet(viewsets.ModelViewSet):
+    queryset = Task.objects.filter(parent_task=None, time_spent__gt=0)
     serializer_class = TaskSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
@@ -73,26 +75,4 @@ class CommentViewSet(viewsets.ModelViewSet):
         return Comment.objects.filter(task=self.kwargs['task_pk'])
 
     serializer_class = CommentSerializer
-    permission_classes = (permissions.IsAuthenticated,)
-
-class AllView(APIView):
-    def get(self, request, format=None):
-        categories = Category.objects.filter(user=get_user(self.request))
-        projects = Project.objects.filter(user=get_user(self.request))
-        projects_detail = []
-        for p in projects:
-            tasks_node = get_all_tasks(p.id, None)
-            tasks = []
-            for c in tasks_node.children:
-                tasks.append(get_all_tasks_dict(c))
-            projects_detail.append(
-                {'title': p.title, 'color': p.color, 'icon': p.icon.url if p.icon else '', 'tasks': tasks}
-            )
-
-        json = simplejson.dumps(
-            {'projects': projects_detail,
-             'categories': [{'id': c.id, 'title': c.title, 'color': c.color} for c in categories]}
-        )
-        return HttpResponse(json, content_type='application/json')
-
     permission_classes = (permissions.IsAuthenticated,)
