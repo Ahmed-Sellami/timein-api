@@ -1,0 +1,7 @@
+Django==4.0.5
+djangorestframework==3.13.1
+djangorestframework_simplejwt==5.2.0
+drf_nested_routers==0.93.4
+python-decouple==3.6
+rest_framework_nested==0.1.0
+simplejson==3.17.6
