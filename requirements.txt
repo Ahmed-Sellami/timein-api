@@ -3,4 +3,3 @@ djangorestframework==3.13.1
 djangorestframework_simplejwt==5.2.0
 drf_nested_routers==0.93.4
 python-decouple==3.6
-drf-nested-routers==0.91
