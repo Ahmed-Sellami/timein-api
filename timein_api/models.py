@@ -33,7 +33,7 @@ class Task(models.Model):
         null=True,
         blank=True
     )
-    lock_task = models.ForeignKey(
+    locked_task = models.ForeignKey(
         'self',
         on_delete=models.CASCADE,
         related_name='prerequisites',

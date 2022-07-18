@@ -2,12 +2,12 @@ from django.urls import path, include
 from rest_framework_nested import routers
 
 from .views import ProjectViewSet, ProjectTaskViewSet, CategoryViewSet, PeriodViewSet, CommentViewSet, \
-   SubtaskViewSet, TaskViewSet, OngoingTaskViewSet
+   SubtaskViewSet, TaskViewSet, TopTaskViewSet
 
 router = routers.DefaultRouter()
 router.register(r'projects', ProjectViewSet, basename='projects')
 router.register(r'categories', CategoryViewSet, basename='categories')
-router.register(r'ongoing-tasks', OngoingTaskViewSet, basename='ongoing-tasks')
+router.register(r'top-tasks', TopTaskViewSet, basename='top-tasks')
 router.register(r'tasks', TaskViewSet, basename='tasks')
 
 projects_tasks_router = routers.NestedSimpleRouter(router, r'projects', lookup='project')

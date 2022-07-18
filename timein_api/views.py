@@ -29,8 +29,8 @@ class ProjectTaskViewSet(viewsets.ModelViewSet):
     serializer_class = ProjectTaskSerializer
     permission_classes = (permissions.IsAuthenticated,)
 
-class OngoingTaskViewSet(viewsets.ModelViewSet):
-    queryset = Task.objects.filter(parent_task=None, time_spent__gt=0)
+class TopTaskViewSet(viewsets.ModelViewSet):
+    queryset = Task.objects.filter(parent_task=None)
     serializer_class = TaskSerializer
     permission_classes = (permissions.IsAuthenticated,)
 

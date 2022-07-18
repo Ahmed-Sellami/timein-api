@@ -45,12 +45,12 @@ class ProjectTaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Task
-        fields = ('category', 'parent_task', 'lock_task', 'title', 'desc', 'time_spent', 'is_done')
+        fields = ('category', 'parent_task', 'locked_task', 'title', 'desc', 'time_spent', 'is_done')
 
 class TaskSerializer(serializers.ModelSerializer):
     class Meta:
         model = Task
-        fields = ('project', 'category', 'parent_task', 'lock_task', 'title', 'desc', 'time_spent', 'is_done')
+        fields = ('project', 'category', 'parent_task', 'locked_task', 'title', 'desc', 'time_spent', 'is_done')
 
 
 class SubtaskSerializer(serializers.ModelSerializer):
@@ -61,4 +61,4 @@ class SubtaskSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Task
-        fields = ('category', 'lock_task', 'title', 'desc', 'time_spent', 'is_done')
+        fields = ('category', 'locked_task', 'title', 'desc', 'time_spent', 'is_done')
